@@ -1,0 +1,47 @@
+services:
+  pgsql:
+    container_name: todo-pgsql
+    image: postgres:15
+    ports: 
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${DB_USER}", "-d", "${DB_NAME}"]
+      interval: 1s
+      retries: 5
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      TZ: ${TZ}
+  
+  server:
+    container_name: todo_server
+    build:
+      context: server
+      dockerfile: Dockerfile
+      target: local
+    ports:
+      - "${SERVER_PORT}:8080"
+    command: ["air", "-c", ".air.toml"]
+    depends_on:
+      pgsql:
+        condition: service_healthy
+    volumes:
+      - type: bind
+        source: ./server
+        target: /src/server
+    environment:
+      PORT: ${SERVER_PORT}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      TZ: ${TZ}
+volumes:
+  db_data:
+    name: todo-pgsql-data
+
+      

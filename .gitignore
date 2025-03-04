@@ -1,0 +1,31 @@
+.env
+.air.toml
+
+# OSファイル
+.DS_Store
+Thumbs.db
+
+# エディタの設定ファイル
+.vscode/
+.idea/
+*.swp
+*~
+
+# ビルド出力
+/dist
+/build
+/out
+
+# 依存関係
+/node_modules
+/vendor
+
+# ログファイル
+/logs
+
+# テストファイル
+/test
+
+openapi.yaml
+
+makefile

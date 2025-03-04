@@ -25,7 +25,3 @@ Thumbs.db
 
 # テストファイル
 /test
-
-openapi.yaml
-
-makefile

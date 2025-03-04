@@ -1,0 +1,382 @@
+openapi: 3.0.0
+servers:
+  - url: http://localhost:8080
+    description: API server
+info:
+  title: Tech Curriculum OpenAPI
+  version: 1.0.0
+
+paths:
+  /tasks:
+    get:
+      operationId: GetTasks
+      description: Get all tasks
+      summary: Get all tasks form /tasks endpoint
+      parameters:
+        - name: title
+          in: query
+          description: Search tasks by title
+          required: false
+          schema:
+            type: string
+        - name: description
+          in: query
+          description: Search tasks by description
+          required: false
+          schema:
+            type: string
+        - name: labelIDs
+          in: query
+          description: Search tasks by label(primary key)
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+        - name: sort
+          in: query
+          description: Sort tasks by priority.
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - "priority"
+                - "finished_at"
+        - name: status
+          in: query
+          description: Search tasks by status
+          required: false
+          schema:
+            $ref: "#/components/schemas/TaskStatus"
+      responses:
+        "200":
+          $ref: "#/components/responses/GetTasksResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /labels:
+    get:
+      operationId: GetLabels
+      description: Get all labels
+      summary: Get all labels from /labels endpoint
+      responses:
+        "200":
+          $ref: "#/components/responses/GetLabelsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /task:
+    post:
+      operationId: CreateTask
+      description: Create a task
+      summary: Create a task form /task/create endpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTaskData"
+      responses:
+        "201":
+          $ref: "#/components/responses/CreateTaskResponse"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /task/{id}:
+    get:
+      operationId: GetTask
+      description: Get a task
+      summary: Get a task form /task{id} endpoint
+      parameters:
+        - name: id
+          in: path
+          description: Task ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          $ref: "#/components/responses/GetTaskResponse"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    put:
+      operationId: UpdateTask
+      description: Update a task
+      summary: Update a task form /task/{id} endpoint
+      parameters:
+        - name: id
+          in: path
+          description: Task ID
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTaskData"
+      responses:
+        "201":
+          $ref: "#/components/responses/UpdateTaskResponse"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    delete:
+      operationId: DeleteTask
+      description: Delete a task
+      summary: Delete a task form /task/{id} endpoint
+      parameters:
+        - name: id
+          in: path
+          description: Task ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          $ref: "#/components/responses/deleteTaskResponse"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "403":
+          $ref: "#/components/responses/forbidden"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+components:
+  responses:
+    badRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Bad request
+    forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Forbidden
+    notFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Not found
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Internal server error
+    GetTasksResponse:
+      description: /tasks response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              tasks:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+    GetLabelsResponse:
+      description: /labels response
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - labels
+            properties:
+              labels:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Label"
+    GetTaskResponse:
+      description: GET/task/{id} response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              task:
+                $ref: "#/components/schemas/Task"
+    CreateTaskResponse:
+      description: /task/create response
+      content:
+        application/json:
+          schema:
+            properties:
+              message:
+                type: string
+                example: Task created successfully
+    UpdateTaskResponse:
+      description: /task/create response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Task Updated successfully
+    deleteTaskResponse:
+      description: /task/create response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Task Deleted successfully
+  schemas:
+    Task:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - priority
+        - status
+        - labels
+        - started_at
+        - finished_at
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "This is a task title"
+        description:
+          type: string
+          example: "This is a task description"
+        priority:
+          $ref: "#/components/schemas/TaskPriority"
+        status:
+          $ref: "#/components/schemas/TaskStatus"
+        labels:
+          type: array
+          items:
+            $ref: "#/components/schemas/Label"
+        started_at:
+          type: string
+          format: date-time
+          example: "2024-12-04T10:00:00Z"
+        finished_at:
+          type: string
+          format: date-time
+          example: "2024-12-10T18:00:00Z"
+    Label:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "programming"
+    TaskStatus:
+      type: string
+      enum:
+        - "Pending"
+        - "In_Process"
+        - "Completed"
+      example: "In_Process"
+    TaskPriority:
+      type: string
+      enum:
+        - "Low"
+        - "Middle"
+        - "High"
+      example: "High"  
+    CreateTaskData:
+      type: object
+      required:
+        - title
+        - description
+        - priority
+        - status
+        - labelIDs
+        - started_at
+        - finished_at
+      properties:
+        title:
+          type: string
+          example: "This is a task title"
+        description:
+          type: string
+          example: "This is a task description"
+        priority:
+          $ref: "#/components/schemas/TaskPriority"
+        status:
+          $ref: "#/components/schemas/TaskStatus"
+        labelIDs:
+          type: array
+          items:
+            type: integer
+            example: [1, 2]
+        started_at:
+          type: string
+          format: date-time
+          example: "2024-12-04T10:00:00Z"
+        finished_at:
+          type: string
+          format: date-time
+          example: "2024-12-10T18:00:00Z"
+    UpdateTaskData:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "This is a task title"
+        description:
+          type: string
+          example: "This is a task description"
+        priority:
+          $ref: "#/components/schemas/TaskPriority"
+        status:
+          $ref: "#/components/schemas/TaskStatus"
+        labelIDs:
+          type: array
+          items:
+            type: integer
+            example: [1, 2]
+        started_at:
+          type: string
+          format: date-time
+          example: "2024-12-04T10:00:00Z"
+        finished_at:
+          type: string
+          format: date-time
+          example: "2024-12-10T18:00:00Z"

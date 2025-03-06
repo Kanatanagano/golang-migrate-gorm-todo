@@ -7,7 +7,6 @@ WORKDIR /src/server
 FROM base AS local
 
 RUN go install -v github.com/air-verse/air@latest
-RUN go install -v github.com/gin-gonic/gin@latest
 
 RUN apt-get update && \
     apt-get upgrade -y && \

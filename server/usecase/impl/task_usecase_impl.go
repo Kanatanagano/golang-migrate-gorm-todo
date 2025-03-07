@@ -17,3 +17,7 @@ func NewTaskUsecase(taskRepository repository.Task_repository) usecase.TaskUseca
 func (u *taskUsecase) GetAllTasks() ([]entity.Task, error) {
 	return u.taskRepository.FindAll()
 }
+
+func (u *taskUsecase) GetTaskById(id int) (entity.Task, error) {
+	return u.taskRepository.FindById(id)
+}

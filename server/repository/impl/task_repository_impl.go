@@ -22,3 +22,11 @@ func (r *task_repository_impl) FindAll() ([]entity.Task, error) {
 	}
 	return tasks, nil
 }
+
+func (r *task_repository_impl) FindById(id int) (entity.Task, error) {
+	var task entity.Task
+	if err := r.db.Preload("Labels").First(&task, id).Error; err != nil {
+		return entity.Task{}, err
+	}
+	return task, nil
+}

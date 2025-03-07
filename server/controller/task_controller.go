@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Kanatanagano/gorm-golang-migrate-todo/entity"
 	"github.com/Kanatanagano/gorm-golang-migrate-todo/usecase"
 	"github.com/gin-gonic/gin"
 )
@@ -38,4 +39,18 @@ func (c *TaskController) GetTaskById(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, task)
+}
+
+func (c *TaskController) CreateTask(ctx *gin.Context) {
+	var task entity.Task
+	if err := ctx.ShouldBindJSON(&task); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	createdTask, err := c.taskUsecase.CreateTask(task)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusCreated, createdTask)
 }

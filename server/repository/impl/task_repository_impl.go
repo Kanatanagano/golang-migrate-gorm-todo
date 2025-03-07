@@ -30,3 +30,10 @@ func (r *task_repository_impl) FindById(id int) (entity.Task, error) {
 	}
 	return task, nil
 }
+
+func (r *task_repository_impl) Create(task entity.Task) (entity.Task, error) {
+	if err := r.db.Create(&task).Error; err != nil {
+		return entity.Task{}, err
+	}
+	return task, nil
+}

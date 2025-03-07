@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/Kanatanagano/gorm-golang-migrate-todo/controller"
@@ -16,8 +15,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(db)
-	fmt.Println("DB connected")
 
 	taskRepository := repository.NewTaskRepository(db)
 	taskUsecase := usecase.NewTaskUsecase(taskRepository)

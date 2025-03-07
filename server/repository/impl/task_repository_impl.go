@@ -12,12 +12,12 @@ type task_repository_impl struct {
 }
 
 func NewTaskRepository(db *gorm.DB) repository.Task_repository {
-	return &task_repository_impl{db}
+	return &task_repository_impl{db: db}
 }
 
 func (r *task_repository_impl) FindAll() ([]entity.Task, error) {
 	var tasks []entity.Task
-	if err := r.db.Find(&tasks).Error; err != nil {
+	if err := r.db.Preload("Labels").Find(&tasks).Error; err != nil {
 		return nil, err
 	}
 	return tasks, nil

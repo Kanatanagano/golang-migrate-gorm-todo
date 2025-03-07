@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/Kanatanagano/gorm-golang-migrate-todo/usecase"
 	"github.com/gin-gonic/gin"
@@ -22,4 +23,19 @@ func (c *TaskController) GetAllTasks(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, tasks)
+}
+
+func (c *TaskController) GetTaskById(ctx *gin.Context) {
+	id := ctx.Param("id")
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
+	task, err := c.taskUsecase.GetTaskById(idInt)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, task)
 }

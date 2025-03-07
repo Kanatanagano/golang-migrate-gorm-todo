@@ -4,6 +4,7 @@ import "github.com/Kanatanagano/gorm-golang-migrate-todo/entity"
 
 type TaskUsecase interface {
 	GetAllTasks() ([]entity.Task, error)
+	GetTaskById(id int) (entity.Task, error)
 }
 
 

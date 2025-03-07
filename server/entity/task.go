@@ -23,7 +23,7 @@ type Task struct {
 	Description string    `json:"description" gorm:"not null;column:description"`
 	Priority    Priority  `json:"priority" gorm:"not null;column:priority;type:priority"`
 	Status      Status    `json:"status" gorm:"not null;column:status;type:status"`
-	Labels      []Label   `json:"labels" gorm:"many2many:task_labels;"`
+	Labels      []*Label   `json:"labels" gorm:"many2many:label_tasks;"`
 	StartedAt   time.Time `json:"started_at" gorm:"not null;column:started_at"`
 	FinishedAt  time.Time `json:"finished_at" gorm:"not null;column:finished_at"`
 	CreatedAt   time.Time `json:"created_at" gorm:"not null;default:now();column:created_at"`

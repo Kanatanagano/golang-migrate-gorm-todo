@@ -1,11 +1,12 @@
 package impl
 
 import (
+	"fmt"
+
 	"github.com/Kanatanagano/gorm-golang-migrate-todo/entity"
 	"github.com/Kanatanagano/gorm-golang-migrate-todo/repository"
 	"gorm.io/gorm"
 )
-
 
 type task_repository_impl struct {
 	db *gorm.DB
@@ -31,9 +32,40 @@ func (r *task_repository_impl) FindById(id int) (entity.Task, error) {
 	return task, nil
 }
 
-func (r *task_repository_impl) Create(task entity.Task) (entity.Task, error) {
-	if err := r.db.Create(&task).Error; err != nil {
-		return entity.Task{}, err
+func (r *task_repository_impl) Create(task entity.Task) (string, error) {
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		// タスクを保存
+		if err := tx.Create(&task).Error; err != nil {
+			return err
+		}
+
+		// ラベルIDが指定されている場合
+		if len(task.LabelIDs) > 0 {
+			// 指定されたIDのラベルを取得
+			var labels []*entity.Label
+			if err := tx.Where("id IN ?", task.LabelIDs).Find(&labels).Error; err != nil {
+				return err
+			}
+
+			// すべてのラベルが存在することを確認
+			if len(labels) != len(task.LabelIDs) {
+				return fmt.Errorf("some labels do not exist")
+			}
+
+			// 中間テーブルに関連を追加
+			for _, labelID := range task.LabelIDs {
+				if err := tx.Exec("INSERT INTO label_tasks (task_id, label_id) VALUES (?, ?)", task.ID, labelID).Error; err != nil {
+					return err
+				}
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return "", err
 	}
-	return task, nil
+
+	return "task created successfully", nil
 }

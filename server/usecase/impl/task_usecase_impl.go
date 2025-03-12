@@ -22,6 +22,6 @@ func (u *taskUsecase) GetTaskById(id int) (entity.Task, error) {
 	return u.taskRepository.FindById(id)
 }
 
-func (u *taskUsecase) CreateTask(task entity.Task) (entity.Task, error) {
+func (u *taskUsecase) CreateTask(task entity.Task) (string, error) {
 	return u.taskRepository.Create(task)
 }

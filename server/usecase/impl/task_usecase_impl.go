@@ -25,3 +25,12 @@ func (u *taskUsecase) GetTaskById(id int) (entity.Task, error) {
 func (u *taskUsecase) CreateTask(task entity.Task) (string, error) {
 	return u.taskRepository.Create(task)
 }
+
+func (u *taskUsecase) UpdateTask(id int, task entity.Task) (entity.Task, error) {
+	return u.taskRepository.Update(id, task)
+}
+
+func (u *taskUsecase) DeleteTask(id int) error {
+	return u.taskRepository.Delete(id)
+}
+
